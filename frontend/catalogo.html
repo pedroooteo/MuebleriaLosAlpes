@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muebles de los Alpes - Catálogo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-brand { font-weight: 700; letter-spacing: 1px; }
+        .mueble-card { transition: transform 0.25s, box-shadow 0.25s; cursor: pointer; border: none; }
+        .mueble-card:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.15); }
+        .badge-tipo { font-size: 0.7rem; }
+        .precio { font-size: 1.4rem; font-weight: 700; color: #198754; }
+        .stock-badge { font-size: 0.75rem; }
+        #buscador { border-radius: 25px 0 0 25px; }
+        #btnBuscar { border-radius: 0 25px 25px 0; }
+        .img-placeholder { height: 180px; background: linear-gradient(135deg,#e0e0e0,#f5f5f5);
+                           display:flex; align-items:center; justify-content:center; color:#aaa; font-size:3rem; }
+        .btn-carrito { background: #198754; color:#fff; border-radius: 25px; }
+        .btn-carrito:hover { background: #157347; color:#fff; }
+        .filtros-card { border-radius: 12px; }
+        #sinResultados { display:none; }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-dark bg-dark shadow-sm sticky-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="catalogo.html">
+                <i class="fas fa-couch me-2"></i>Muebles de los Alpes
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <span id="lblUsuario" class="text-light small me-2"></span>
+                <a href="carrito.html" class="btn btn-warning btn-sm position-relative">
+                    <i class="fas fa-shopping-cart"></i> Carrito
+                </a>
+                <a id="btnPerfil" href="perfil.html" class="btn btn-outline-light btn-sm d-none">
+                    <i class="fas fa-user"></i> Mi Perfil
+                </a>
+                <a id="btnLogin" href="login.html" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-sign-in-alt"></i> Ingresar
+                </a>
+                <a id="btnLogout" href="#" class="btn btn-outline-danger btn-sm d-none" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <!-- FILTROS -->
+        <div class="card filtros-card shadow-sm mb-4 p-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" id="buscador" class="form-control"
+                               placeholder="Buscar por nombre o referencia..." oninput="filtrarMuebles()">
+                        <button class="btn btn-success" id="btnBuscar" onclick="filtrarMuebles()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="filtroTipo" class="form-select" onchange="filtrarMuebles()">
+                        <option value="">Todos los tipos</option>
+                        <option value="INTERIOR">Interior</option>
+                        <option value="EXTERIOR">Exterior</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltros()">
+                        <i class="fas fa-times"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LISTADO -->
+        <div id="listaMuebles" class="row g-4"></div>
+        <div id="sinResultados" class="text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No se encontraron muebles con esos criterios</h5>
+        </div>
+        <div id="cargando" class="text-center py-5">
+            <div class="spinner-border text-success" role="status"></div>
+            <p class="mt-2 text-muted">Cargando catálogo...</p>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="modalNombre"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div id="modalImg" class="img-placeholder rounded mb-3">
+                                <i class="fas fa-couch"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <p id="modalDescripcion" class="text-muted"></p>
+                            <table class="table table-sm table-bordered">
+                                <tbody>
+                                    <tr><th>Referencia</th><td id="modalRef"></td></tr>
+                                    <tr><th>Tipo</th><td id="modalTipo"></td></tr>
+                                    <tr><th>Categoría</th><td id="modalCategoria"></td></tr>
+                                    <tr><th>Material</th><td id="modalMaterial"></td></tr>
+                                    <tr><th>Color</th><td id="modalColor"></td></tr>
+                                    <tr><th>Dimensiones (Alto×Ancho×Prof cm)</th><td id="modalDims"></td></tr>
+                                    <tr><th>Peso</th><td id="modalPeso"></td></tr>
+                                    <tr><th>Stock disponible</th><td id="modalStock"></td></tr>
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="precio" id="modalPrecio"></span>
+                                <button class="btn btn-carrito px-4" id="btnAgregarModal">
+                                    <i class="fas fa-cart-plus me-1"></i> Agregar al carrito
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        let todosMuebles = [];
+
+        async function cargarCatalogo() {
+            document.getElementById('cargando').style.display = 'block';
+            try {
+                const res = await fetch('http://localhost:8080/api/muebles');
+                todosMuebles = await res.json();
+                renderMuebles(todosMuebles);
+            } catch (e) {
+                document.getElementById('listaMuebles').innerHTML =
+                    `<div class="col-12"><div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        No se pudo conectar con el servidor. Verifica que el backend esté corriendo.
+                    </div></div>`;
+            } finally {
+                document.getElementById('cargando').style.display = 'none';
+            }
+        }
+
+        function renderMuebles(lista) {
+            const container = document.getElementById('listaMuebles');
+            const sinRes = document.getElementById('sinResultados');
+            container.innerHTML = '';
+
+            if (lista.length === 0) {
+                sinRes.style.display = 'block';
+                return;
+            }
+            sinRes.style.display = 'none';
+
+            lista.forEach(m => {
+                const col = document.createElement('div');
+                col.className = 'col-sm-6 col-md-4 col-lg-3';
+                const tipoBadge = m.Tipo === 'INTERIOR'
+                    ? '<span class="badge bg-info badge-tipo">Interior</span>'
+                    : '<span class="badge bg-success badge-tipo">Exterior</span>';
+                const imgHtml = m.FotoUrl
+                    ? `<img src="${m.FotoUrl}" class="rounded-top w-100" style="height:180px;object-fit:cover;" onerror="this.parentElement.innerHTML='<div class=\\'img-placeholder rounded-top\\'><i class=\\'fas fa-couch\\'></i></div>'">`
+                    : `<div class="img-placeholder rounded-top"><i class="fas fa-couch"></i></div>`;
+                col.innerHTML = `
+                    <div class="card mueble-card h-100 shadow-sm" onclick="verDetalle(${m.ID_Mueble})">
+                        ${imgHtml}
+                        <div class="card-body d-flex flex-column p-3">
+                            ${tipoBadge}
+                            <h6 class="card-title mt-2 mb-1 fw-bold">${m.Nombre}</h6>
+                            <p class="text-muted small mb-1">${m.Referencia}</p>
+                            ${m.Material ? `<p class="text-muted small mb-1"><i class="fas fa-cube me-1"></i>${m.Material}${m.Color ? ' · ' + m.Color : ''}</p>` : ''}
+                            <div class="mt-auto">
+                                <div class="precio mb-2">Q ${parseFloat(m.Precio).toFixed(2)}</div>
+                                <span class="badge bg-light text-dark stock-badge border mb-2">
+                                    <i class="fas fa-box me-1"></i>Stock: ${m.Stock}
+                                </span>
+                                <button class="btn btn-carrito w-100 btn-sm"
+                                        onclick="event.stopPropagation(); agregarAlCarrito(${m.ID_Mueble}, '${m.Nombre.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-cart-plus me-1"></i> Agregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                container.appendChild(col);
+            });
+        }
+
+        function filtrarMuebles() {
+            const texto = document.getElementById('buscador').value.toLowerCase();
+            const tipo = document.getElementById('filtroTipo').value;
+            const filtrados = todosMuebles.filter(m => {
+                const coincideTexto = !texto ||
+                    m.Nombre.toLowerCase().includes(texto) ||
+                    m.Referencia.toLowerCase().includes(texto);
+                const coincideTipo = !tipo || m.Tipo === tipo;
+                return coincideTexto && coincideTipo;
+            });
+            renderMuebles(filtrados);
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('buscador').value = '';
+            document.getElementById('filtroTipo').value = '';
+            renderMuebles(todosMuebles);
+        }
+
+        async function verDetalle(idMueble) {
+            try {
+                const res = await fetch(`http://localhost:8080/api/muebles/detalle?id=${idMueble}`);
+                const m = await res.json();
+                document.getElementById('modalNombre').textContent = m.Nombre;
+                document.getElementById('modalRef').textContent = m.Referencia;
+                document.getElementById('modalTipo').textContent = m.Tipo;
+                document.getElementById('modalCategoria').textContent = m.Categoria || '-';
+                document.getElementById('modalMaterial').textContent = m.Material || '-';
+                document.getElementById('modalColor').textContent = m.Color || '-';
+                document.getElementById('modalDims').textContent = `${m.AltoCm} × ${m.AnchoCm} × ${m.ProfundidadCm}`;
+                document.getElementById('modalPeso').textContent = `${m.PesoGramos} g`;
+                document.getElementById('modalStock').textContent = m.Stock;
+                document.getElementById('modalDescripcion').textContent = m.Descripcion || '';
+                document.getElementById('modalPrecio').textContent = `Q ${parseFloat(m.Precio).toFixed(2)}`;
+                document.getElementById('btnAgregarModal').onclick = () => {
+                    agregarAlCarrito(m.ID_Mueble, m.Nombre);
+                    bootstrap.Modal.getInstance(document.getElementById('modalDetalle')).hide();
+                };
+                new bootstrap.Modal(document.getElementById('modalDetalle')).show();
+            } catch (e) {
+                alert('Error al cargar detalle del mueble');
+            }
+        }
+
+        async function agregarAlCarrito(idMueble, nombre) {
+            const usuarioLogueado = localStorage.getItem('usuarioLogueado');
+            if (!usuarioLogueado) {
+                if (confirm('Debes iniciar sesión para agregar al carrito.\n¿Deseas ir al login?')) {
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+            const idCliente = parseInt(localStorage.getItem('idCliente') || '0');
+            if (!idCliente) {
+                alert('Error: no se encontró tu ID de cliente.\nCierra sesión, reinicia el servidor y vuelve a ingresar.');
+                return;
+            }
+            try {
+                const res = await fetch('http://localhost:8080/api/carrito/agregar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idCliente, idMueble, cantidad: 1 })
+                });
+                const data = await res.json();
+                if (data.exito) {
+                    mostrarToast(`✅ "${nombre}" agregado al carrito`);
+                } else {
+                    alert('Error: ' + data.mensaje);
+                }
+            } catch (e) {
+                alert('No se pudo conectar con el servidor');
+            }
+        }
+
+        function mostrarToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'position-fixed bottom-0 end-0 m-4 alert alert-success shadow fw-bold';
+            t.style.zIndex = '9999';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        function cerrarSesion() {
+            localStorage.clear();
+            window.location.reload();
+        }
+
+        // Inicialización
+        window.onload = () => {
+            const username = localStorage.getItem('usuarioLogueado');
+            if (username) {
+                document.getElementById('lblUsuario').textContent = `👤 ${username}`;
+                document.getElementById('btnLogin').classList.add('d-none');
+                document.getElementById('btnLogout').classList.remove('d-none');
+                document.getElementById('btnPerfil').classList.remove('d-none');
+            }
+            cargarCatalogo();
+        };
+    </script>
+</body>
+</html>

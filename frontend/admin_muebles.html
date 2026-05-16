@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Muebles - Muebles de los Alpes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6f9; }
+        .sidebar { width: 240px; min-height: 100vh; background: #1a1a2e; position: fixed; }
+        .sidebar .nav-link { color: #ccc; border-radius: 8px; margin: 2px 8px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #16213e; color: #fff; }
+        .sidebar .nav-link i { width: 20px; }
+        .main { margin-left: 240px; padding: 2rem; }
+        .ref-link { color: #0d6efd; cursor: pointer; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar d-flex flex-column py-3">
+        <div class="text-center mb-4 px-3">
+            <i class="fas fa-couch fa-2x text-warning"></i>
+            <div class="text-white fw-bold mt-1">Admin Panel</div>
+        </div>
+        <ul class="nav flex-column">
+            <li><a class="nav-link" href="admin.html"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+            <li><a class="nav-link active" href="admin_muebles.html"><i class="fas fa-couch me-2"></i>Muebles</a></li>
+            <li><a class="nav-link" href="admin_precios_stock.html"><i class="fas fa-tags me-2"></i>Precios & Stock</a></li>
+            <li><a class="nav-link" href="admin_clientes.html"><i class="fas fa-users me-2"></i>Clientes</a></li>
+            <li><a class="nav-link" href="admin_reportes.html"><i class="fas fa-chart-bar me-2"></i>Reportes</a></li>
+            <li class="nav-item mt-3"><hr class="border-secondary"></li>
+            <li><a class="nav-link" href="catalogo.html"><i class="fas fa-store me-2"></i>Ver Tienda</a></li>
+            <li><a class="nav-link text-danger" href="#" onclick="Sesion.cerrar();location.href='login.html'"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <main class="main">
+        <h3 class="fw-bold mb-4"><i class="fas fa-couch me-2 text-primary"></i>Administración de Muebles</h3>
+
+        <!-- BUSCADOR -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Buscar por referencia, nombre</label>
+                        <input type="text" id="inpBuscar" class="form-control" placeholder="Ej: MESA, SOFA, NAT001...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Tipo</label>
+                        <select id="selTipo" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="INTERIOR">Interior</option>
+                            <option value="EXTERIOR">Exterior</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" onclick="buscar()">
+                            <i class="fas fa-search me-1"></i>Buscar
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-success w-100" onclick="abrirCrear()">
+                            <i class="fas fa-plus me-1"></i>Nuevo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTADOS -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Referencia</th><th>Nombre</th><th>Tipo</th>
+                                <th>Categoría</th><th>Precio</th><th>Stock</th><th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblMuebles">
+                            <tr><td colspan="7" class="text-center py-4 text-muted">Realiza una búsqueda para ver resultados</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL CREAR/EDITAR MUEBLE -->
+    <div class="modal fade" id="modalMueble" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="tituloModal">Nuevo Mueble</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="fIdMueble">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Referencia *</label>
+                            <input type="text" id="fReferencia" class="form-control" maxlength="50">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" id="fNombre" class="form-control" maxlength="100">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo *</label>
+                            <select id="fTipo" class="form-select">
+                                <option value="INTERIOR">Interior</option>
+                                <option value="EXTERIOR">Exterior</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Descripción</label>
+                            <textarea id="fDescripcion" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Categoría *</label>
+                            <select id="fCategoria" class="form-select"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Material</label>
+                            <input type="text" id="fMaterial" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Alto (cm) *</label>
+                            <input type="number" id="fAlto" class="form-control" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Ancho (cm) *</label>
+                            <input type="number" id="fAncho" class="form-control" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Prof. (cm) *</label>
+                            <input type="number" id="fProf" class="form-control" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Color</label>
+                            <input type="text" id="fColor" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Peso (gramos) *</label>
+                            <input type="number" id="fPeso" class="form-control" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Precio (Q) *</label>
+                            <input type="number" id="fPrecio" class="form-control" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Stock *</label>
+                            <input type="number" id="fStock" class="form-control" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">URL Foto</label>
+                            <input type="text" id="fFoto" class="form-control" placeholder="https://...">
+                        </div>
+                    </div>
+                    <div id="alertModal" class="alert d-none mt-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-success" id="btnGuardar" onclick="guardar()">
+                        <i class="fas fa-save me-1"></i>Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="clases.js"></script>
+    <script>
+        if (!Sesion.requiereAdmin()) {}
+
+        let modalMueble, modoEdicion = false;
+
+        async function init() {
+            modalMueble = new bootstrap.Modal(document.getElementById('modalMueble'));
+            const cats = await muebleService.categorias();
+            const sel = document.getElementById('fCategoria');
+            cats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.idCategoria ?? c.ID_CATEGORIA;
+                opt.textContent = c.nombre ?? c.NOMBRE;
+                sel.appendChild(opt);
+            });
+            buscar();
+        }
+
+        async function buscar() {
+            const criterio = document.getElementById('inpBuscar').value;
+            const tipo = document.getElementById('selTipo').value;
+            const tbody = document.getElementById('tblMuebles');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-3"><div class="spinner-border spinner-border-sm"></div> Buscando...</td></tr>';
+            try {
+                const lista = await muebleService.buscarAdmin(criterio, tipo);
+                if (!lista.length) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-3 text-muted">Sin resultados</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = '';
+                lista.forEach(m => {
+                    const mueble = new Mueble(m);
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="ref-link" onclick="abrirEditar(${mueble.idMueble})">${mueble.referencia}</span></td>
+                        <td>${mueble.nombre}</td>
+                        <td>${mueble.tipoBadge}</td>
+                        <td>${mueble.categoria || '-'}</td>
+                        <td class="fw-bold text-success">${mueble.precioFormateado}</td>
+                        <td><span class="badge ${mueble.stock > 0 ? 'bg-success' : 'bg-danger'}">${mueble.stock}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-1" onclick="abrirEditar(${mueble.idMueble})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="eliminarMueble(${mueble.idMueble}, '${mueble.nombre.replace(/'/g,"\\'")}', ${mueble.stock})" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+            } catch { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error al cargar</td></tr>'; }
+        }
+
+        function abrirCrear() {
+            modoEdicion = false;
+            document.getElementById('tituloModal').textContent = 'Nuevo Mueble';
+            document.getElementById('fIdMueble').value = '';
+            ['fReferencia','fNombre','fDescripcion','fMaterial','fColor','fFoto'].forEach(id => document.getElementById(id).value = '');
+            ['fAlto','fAncho','fProf','fPeso','fPrecio','fStock'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('alertModal').className = 'alert d-none';
+            modalMueble.show();
+        }
+
+        async function abrirEditar(id) {
+            modoEdicion = true;
+            document.getElementById('tituloModal').textContent = 'Modificar Mueble';
+            document.getElementById('alertModal').className = 'alert d-none';
+            try {
+                const data = await muebleService.detalle(id);
+                const m = new Mueble(data);
+                document.getElementById('fIdMueble').value = m.idMueble;
+                document.getElementById('fReferencia').value = m.referencia;
+                document.getElementById('fNombre').value = m.nombre;
+                document.getElementById('fDescripcion').value = m.descripcion;
+                document.getElementById('fTipo').value = m.tipo;
+                document.getElementById('fCategoria').value = m.idCategoria;
+                document.getElementById('fMaterial').value = m.material;
+                document.getElementById('fAlto').value = m.altoCm;
+                document.getElementById('fAncho').value = m.anchoCm;
+                document.getElementById('fProf').value = m.profundidadCm;
+                document.getElementById('fColor').value = m.color;
+                document.getElementById('fPeso').value = m.pesoGramos;
+                document.getElementById('fFoto').value = m.fotoUrl;
+                document.getElementById('fPrecio').value = m.precio;
+                document.getElementById('fStock').value = m.stock;
+                modalMueble.show();
+            } catch { alert('Error al cargar el mueble'); }
+        }
+
+        async function guardar() {
+            const btn = document.getElementById('btnGuardar');
+            btn.disabled = true;
+            const alerta = document.getElementById('alertModal');
+            try {
+                const payload = {
+                    idMueble: parseInt(document.getElementById('fIdMueble').value || '0'),
+                    referencia: document.getElementById('fReferencia').value,
+                    nombre: document.getElementById('fNombre').value,
+                    descripcion: document.getElementById('fDescripcion').value,
+                    tipo: document.getElementById('fTipo').value,
+                    idCategoria: parseInt(document.getElementById('fCategoria').value),
+                    material: document.getElementById('fMaterial').value,
+                    altoCm: parseFloat(document.getElementById('fAlto').value),
+                    anchoCm: parseFloat(document.getElementById('fAncho').value),
+                    profundidadCm: parseFloat(document.getElementById('fProf').value),
+                    color: document.getElementById('fColor').value,
+                    pesoGramos: parseFloat(document.getElementById('fPeso').value),
+                    fotoUrl: document.getElementById('fFoto').value,
+                    precio: parseFloat(document.getElementById('fPrecio').value),
+                    stock: parseInt(document.getElementById('fStock').value)
+                };
+
+                let res;
+                if (modoEdicion) {
+                    res = await muebleService.modificar(payload);
+                } else {
+                    res = await api.post('/api/muebles', payload);
+                }
+
+                alerta.className = `alert ${res.exito ? 'alert-success' : 'alert-danger'}`;
+                alerta.textContent = res.mensaje || (res.exito ? 'Guardado' : 'Error');
+                if (res.exito) { buscar(); setTimeout(() => modalMueble.hide(), 1500); }
+            } catch (e) {
+                alerta.className = 'alert alert-danger';
+                alerta.textContent = 'Error de comunicación';
+            }
+            btn.disabled = false;
+        }
+
+        async function eliminarMueble(id, nombre, stock) {
+            if (!confirm(`¿Eliminar "${nombre}"?\n\nEsta acción solo es posible si ningún cliente lo ha comprado.\nSe eliminará también de los carritos activos.`)) return;
+            const res = await muebleService.eliminar(id);
+            alert(res.mensaje);
+            if (res.exito) buscar();
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muebles de los Alpes - Inicio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --verde: #2d6a4f; --dorado: #c9a227; }
+        body { font-family: 'Segoe UI', sans-serif; }
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex; align-items: center; color: white;
+        }
+        .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; }
+        .logo-icon { font-size: 4rem; color: var(--dorado); }
+        .btn-primary-custom {
+            background: var(--dorado); color: #1a1a2e; border: none;
+            font-weight: 700; padding: .75rem 2rem; border-radius: 50px;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(201,162,39,.4); color: #1a1a2e; }
+        .btn-android {
+            background: #3ddc84; color: #000; border: none; font-weight: 700;
+            padding: .75rem 2rem; border-radius: 50px; transition: transform .2s;
+        }
+        .btn-android:hover { transform: translateY(-2px); background: #2ab870; }
+        .feature-card { border: none; border-radius: 16px; transition: transform .2s; }
+        .feature-card:hover { transform: translateY(-4px); }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        section { padding: 5rem 0; }
+        .section-dark { background: #1a1a2e; color: white; }
+        footer { background: #0d0d1a; color: #888; }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-dark bg-dark bg-opacity-90 position-fixed top-0 w-100" style="z-index:1000">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-couch me-2 text-warning"></i>Muebles de los Alpes
+            </a>
+            <div class="d-flex gap-2">
+                <a href="catalogo.html" class="btn btn-outline-warning btn-sm">
+                    <i class="fas fa-store me-1"></i>Catálogo
+                </a>
+                <a href="login.html" class="btn btn-warning btn-sm text-dark fw-bold">
+                    <i class="fas fa-sign-in-alt me-1"></i>Ingresar
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero pt-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="logo-icon mb-3"><i class="fas fa-couch"></i></div>
+                    <h1>Muebles de<br><span style="color:var(--dorado)">los Alpes</span></h1>
+                    <p class="lead text-light opacity-75 my-4">
+                        Elegancia, calidad y confort para cada espacio de tu hogar.
+                        Muebles de interior y exterior con diseños únicos y materiales premium.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="catalogo.html" class="btn btn-primary-custom">
+                            <i class="fas fa-store me-2"></i>Ver Catálogo
+                        </a>
+                        <a href="registro.html" class="btn btn-outline-light" style="border-radius:50px;padding:.75rem 2rem">
+                            <i class="fas fa-user-plus me-2"></i>Registrarse
+                        </a>
+                    </div>
+                    <!-- BOTÓN APP ANDROID -->
+                    <div class="mt-4">
+                        <p class="text-warning small fw-bold mb-2"><i class="fab fa-android me-1"></i>¡Próximamente disponible!</p>
+                        <button class="btn btn-android" onclick="alert('Nuestra app para Android estará disponible próximamente en Google Play Store.\n\n¡Mantente atento!')">
+                            <i class="fab fa-google-play me-2"></i>Descargar App para Android
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                    <div style="font-size:12rem;opacity:.15;line-height:1"><i class="fas fa-couch"></i></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section>
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">¿Por qué elegirnos?</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm h-100 p-4 text-center">
+                        <div class="feature-icon text-success"><i class="fas fa-tree"></i></div>
+                        <h5 class="fw-bold">Materiales Naturales</h5>
+                        <p class="text-muted">Madera, cuero y textiles de primera calidad seleccionados cuidadosamente.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm h-100 p-4 text-center">
+                        <div class="feature-icon text-warning"><i class="fas fa-star"></i></div>
+                        <h5 class="fw-bold">Diseño Exclusivo</h5>
+                        <p class="text-muted">Colecciones únicas para interior y exterior que combinan estilo y funcionalidad.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card shadow-sm h-100 p-4 text-center">
+                        <div class="feature-icon text-primary"><i class="fas fa-shield-alt"></i></div>
+                        <h5 class="fw-bold">Garantía Total</h5>
+                        <p class="text-muted">Todos nuestros productos tienen garantía y soporte post-venta.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section class="section-dark">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Nuestras Colecciones</h2>
+            <div class="row g-3 justify-content-center">
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-4 rounded" style="background:rgba(255,255,255,.05)">
+                        <i class="fas fa-couch fa-2x text-warning mb-2"></i>
+                        <div class="fw-bold">Sala</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-4 rounded" style="background:rgba(255,255,255,.05)">
+                        <i class="fas fa-bed fa-2x text-info mb-2"></i>
+                        <div class="fw-bold">Dormitorio</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-4 rounded" style="background:rgba(255,255,255,.05)">
+                        <i class="fas fa-utensils fa-2x text-success mb-2"></i>
+                        <div class="fw-bold">Comedor</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-center p-4 rounded" style="background:rgba(255,255,255,.05)">
+                        <i class="fas fa-leaf fa-2x text-warning mb-2"></i>
+                        <div class="fw-bold">Exterior</div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-5">
+                <a href="catalogo.html" class="btn btn-primary-custom">
+                    <i class="fas fa-arrow-right me-2"></i>Explorar catálogo completo
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="bg-warning">
+        <div class="container text-center py-3">
+            <h3 class="fw-bold text-dark mb-2">¿Listo para amueblar tu espacio?</h3>
+            <p class="text-dark mb-4">Crea tu cuenta y comienza a comprar con envío a toda Guatemala.</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="registro.html" class="btn btn-dark btn-lg" style="border-radius:50px">
+                    <i class="fas fa-user-plus me-2"></i>Crear cuenta gratis
+                </a>
+                <a href="catalogo.html" class="btn btn-outline-dark btn-lg" style="border-radius:50px">
+                    <i class="fas fa-eye me-2"></i>Ver productos
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-4">
+        <div class="container text-center">
+            <p class="mb-1"><i class="fas fa-couch me-2 text-warning"></i><strong class="text-white">Muebles de los Alpes</strong></p>
+            <p class="small mb-0">Guatemala &bull; <a href="tel:+50222345678" class="text-secondary">+502 2234-5678</a> &bull; <a href="mailto:info@mueblesalpes.gt" class="text-secondary">info@mueblesalpes.gt</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

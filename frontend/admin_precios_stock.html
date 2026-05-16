@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precios & Stock - Muebles de los Alpes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6f9; }
+        .sidebar { width: 240px; min-height: 100vh; background: #1a1a2e; position: fixed; }
+        .sidebar .nav-link { color: #ccc; border-radius: 8px; margin: 2px 8px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #16213e; color: #fff; }
+        .main { margin-left: 240px; padding: 2rem; }
+        .precio-input { width: 110px; }
+        .stock-input  { width: 80px; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar d-flex flex-column py-3">
+        <div class="text-center mb-4 px-3">
+            <i class="fas fa-couch fa-2x text-warning"></i>
+            <div class="text-white fw-bold mt-1">Admin Panel</div>
+        </div>
+        <ul class="nav flex-column">
+            <li><a class="nav-link" href="admin.html"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+            <li><a class="nav-link" href="admin_muebles.html"><i class="fas fa-couch me-2"></i>Muebles</a></li>
+            <li><a class="nav-link active" href="admin_precios_stock.html"><i class="fas fa-tags me-2"></i>Precios & Stock</a></li>
+            <li><a class="nav-link" href="admin_clientes.html"><i class="fas fa-users me-2"></i>Clientes</a></li>
+            <li><a class="nav-link" href="admin_reportes.html"><i class="fas fa-chart-bar me-2"></i>Reportes</a></li>
+            <li class="nav-item mt-3"><hr class="border-secondary"></li>
+            <li><a class="nav-link" href="catalogo.html"><i class="fas fa-store me-2"></i>Ver Tienda</a></li>
+            <li><a class="nav-link text-danger" href="#" onclick="Sesion.cerrar();location.href='login.html'"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <main class="main">
+        <h3 class="fw-bold mb-4"><i class="fas fa-tags me-2 text-warning"></i>Precios y Stock</h3>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Buscar mueble</label>
+                        <input type="text" id="inpBuscar" class="form-control" placeholder="Referencia o nombre...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Tipo</label>
+                        <select id="selTipo" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="INTERIOR">Interior</option>
+                            <option value="EXTERIOR">Exterior</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" onclick="buscar()">
+                            <i class="fas fa-search me-1"></i>Buscar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="alertGlobal" class="alert d-none mb-3"></div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Referencia</th><th>Nombre</th><th>Tipo</th>
+                                <th>Precio Actual (Q)</th><th>Stock Actual</th>
+                                <th>Nuevo Precio</th><th>Nuevo Stock</th><th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblMuebles">
+                            <tr><td colspan="8" class="text-center py-4 text-muted">Busca un mueble para actualizar</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="clases.js"></script>
+    <script>
+        if (!Sesion.requiereAdmin()) {}
+
+        async function buscar() {
+            const criterio = document.getElementById('inpBuscar').value;
+            const tipo = document.getElementById('selTipo').value;
+            const tbody = document.getElementById('tblMuebles');
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3"><div class="spinner-border spinner-border-sm"></div></td></tr>';
+            try {
+                const lista = await muebleService.buscarAdmin(criterio, tipo);
+                if (!lista.length) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted">Sin resultados</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = '';
+                lista.forEach(data => {
+                    const m = new Mueble(data);
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${m.referencia}</strong></td>
+                        <td>${m.nombre}</td>
+                        <td>${m.tipoBadge}</td>
+                        <td class="text-success fw-bold">${m.precioFormateado}</td>
+                        <td><span class="badge ${m.stock > 0 ? 'bg-success' : 'bg-danger'}">${m.stock}</span></td>
+                        <td><input type="number" class="form-control precio-input inp-precio-${m.idMueble}" value="${m.precio}" step="0.01" min="0"></td>
+                        <td><input type="number" class="form-control stock-input inp-stock-${m.idMueble}" value="${m.stock}" min="0"></td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="actualizar(${m.idMueble})">
+                                <i class="fas fa-save me-1"></i>Guardar
+                            </button>
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+            } catch { tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error al cargar</td></tr>'; }
+        }
+
+        async function actualizar(idMueble) {
+            const precio = parseFloat(document.querySelector(`.inp-precio-${idMueble}`).value);
+            const stock  = parseInt(document.querySelector(`.inp-stock-${idMueble}`).value);
+            if (isNaN(precio) || precio <= 0) { alert('Ingresa un precio válido'); return; }
+            if (isNaN(stock) || stock < 0) { alert('Ingresa un stock válido'); return; }
+
+            const alerta = document.getElementById('alertGlobal');
+            try {
+                const res = await muebleService.precioStock({ idMueble, precio, stock });
+                alerta.className = `alert ${res.exito ? 'alert-success' : 'alert-danger'}`;
+                alerta.textContent = res.exito ? `✓ Actualizado correctamente` : res.mensaje;
+                if (res.exito) setTimeout(() => buscar(), 1500);
+            } catch {
+                alerta.className = 'alert alert-danger';
+                alerta.textContent = 'Error de comunicación';
+            }
+        }
+
+        buscar();
+    </script>
+</body>
+</html>

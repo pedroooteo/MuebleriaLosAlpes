@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Muebles de los Alpes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6f9; }
+        .sidebar { width: 240px; min-height: 100vh; background: #1a1a2e; position: fixed; }
+        .sidebar .nav-link { color: #ccc; border-radius: 8px; margin: 2px 8px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #16213e; color: #fff; }
+        .main { margin-left: 240px; padding: 2rem; }
+        .rep-tab { cursor: pointer; }
+        .rep-tab.active { background: #0d6efd !important; color: #fff !important; }
+        .badge-replica { background: #198754; color: white; font-size: 0.7rem; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar d-flex flex-column py-3">
+        <div class="text-center mb-4 px-3">
+            <i class="fas fa-couch fa-2x text-warning"></i>
+            <div class="text-white fw-bold mt-1">Admin Panel</div>
+        </div>
+        <ul class="nav flex-column">
+            <li><a class="nav-link" href="admin.html"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+            <li><a class="nav-link" href="admin_muebles.html"><i class="fas fa-couch me-2"></i>Muebles</a></li>
+            <li><a class="nav-link" href="admin_precios_stock.html"><i class="fas fa-tags me-2"></i>Precios & Stock</a></li>
+            <li><a class="nav-link" href="admin_clientes.html"><i class="fas fa-users me-2"></i>Clientes</a></li>
+            <li><a class="nav-link active" href="admin_reportes.html"><i class="fas fa-chart-bar me-2"></i>Reportes</a></li>
+            <li class="nav-item mt-3"><hr class="border-secondary"></li>
+            <li><a class="nav-link" href="catalogo.html"><i class="fas fa-store me-2"></i>Ver Tienda</a></li>
+            <li><a class="nav-link text-danger" href="#" onclick="Sesion.cerrar();location.href='login.html'"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <main class="main">
+        <h3 class="fw-bold mb-1"><i class="fas fa-chart-bar me-2 text-danger"></i>Reportes</h3>
+        <p class="text-muted small mb-4">
+            <span class="badge badge-replica"><i class="fas fa-database me-1"></i>BD Réplica</span>
+            Todos los reportes se generan desde la base de datos Standby (DataGuard)
+        </p>
+
+        <!-- TABS -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <button class="btn btn-outline-secondary btn-sm rep-tab active" onclick="activarTab(this,'ventas')">Ventas Diarias</button>
+            <button class="btn btn-outline-secondary btn-sm rep-tab" onclick="activarTab(this,'top')">Producto Top</button>
+            <button class="btn btn-outline-secondary btn-sm rep-tab" onclick="activarTab(this,'historial')">Historial Cliente</button>
+            <button class="btn btn-outline-secondary btn-sm rep-tab" onclick="activarTab(this,'cajas')">Cierre de Cajas</button>
+            <button class="btn btn-outline-secondary btn-sm rep-tab" onclick="activarTab(this,'ltv')">LTV</button>
+            <button class="btn btn-outline-secondary btn-sm rep-tab" onclick="activarTab(this,'actividad')">Actividad</button>
+            <button class="btn btn-outline-secondary btn-sm rep-tab" onclick="activarTab(this,'retencion')">Retención</button>
+            <button class="btn btn-outline-secondary btn-sm rep-tab" onclick="activarTab(this,'cohorte')">Cohorte</button>
+            <button class="btn btn-outline-secondary btn-sm rep-tab" onclick="activarTab(this,'remarketing')">Remarketing</button>
+        </div>
+
+        <!-- FILTROS DINÁMICOS -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-2 align-items-end" id="filtrosReporte">
+                    <div class="col-md-3 filtro-fecha">
+                        <label class="form-label fw-semibold">Fecha inicio</label>
+                        <input type="date" id="fFechaIni" class="form-control">
+                    </div>
+                    <div class="col-md-3 filtro-fecha">
+                        <label class="form-label fw-semibold">Fecha fin</label>
+                        <input type="date" id="fFechaFin" class="form-control">
+                    </div>
+                    <div class="col-md-3 filtro-ciudad" style="display:none">
+                        <label class="form-label fw-semibold">Ciudad</label>
+                        <select id="fCiudad" class="form-select">
+                            <option value="0">Todas las ciudades</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 filtro-cliente" style="display:none">
+                        <label class="form-label fw-semibold">ID Cliente</label>
+                        <input type="number" id="fIdCliente" class="form-control" placeholder="ID del cliente">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-danger w-100" onclick="generarReporte()">
+                            <i class="fas fa-play me-1"></i>Generar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTADOS -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span id="lblTituloReporte">Ventas Diarias</span>
+                <button class="btn btn-sm btn-outline-light" onclick="exportarCSV()">
+                    <i class="fas fa-download me-1"></i>Exportar CSV
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div id="contenidoReporte" class="p-4 text-center text-muted">
+                    Selecciona filtros y presiona "Generar"
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="clases.js"></script>
+    <script>
+        if (!Sesion.requiereAdmin()) {}
+
+        let tabActual = 'ventas';
+        let datosReporte = [];
+
+        const config = {
+            ventas:      { titulo: 'Ventas Diarias', fecha: true, ciudad: true, cliente: false },
+            top:         { titulo: 'Producto Más Vendido', fecha: true, ciudad: true, cliente: false },
+            historial:   { titulo: 'Historial de Cliente', fecha: false, ciudad: false, cliente: true },
+            cajas:       { titulo: 'Cierre de Cajas', fecha: true, ciudad: false, cliente: false },
+            ltv:         { titulo: 'LTV (Valor de Vida Útil)', fecha: false, ciudad: false, cliente: false },
+            actividad:   { titulo: 'Actividad de Clientes', fecha: true, ciudad: false, cliente: false },
+            retencion:   { titulo: 'Retención de Clientes', fecha: false, ciudad: false, cliente: false },
+            cohorte:     { titulo: 'Análisis de Cohorte', fecha: false, ciudad: false, cliente: false },
+            remarketing: { titulo: 'Remarketing (Carritos Activos)', fecha: false, ciudad: false, cliente: false }
+        };
+
+        async function init() {
+            const hoy = new Date().toISOString().split('T')[0];
+            const hace30 = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
+            document.getElementById('fFechaIni').value = hace30;
+            document.getElementById('fFechaFin').value = hoy;
+
+            try {
+                const ciudades = await api.get('/api/ciudades');
+                const sel = document.getElementById('fCiudad');
+                ciudades.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.ID_CIUDAD ?? c.idCiudad;
+                    opt.textContent = `${c.CIUDAD ?? c.ciudad} (${c.DEPARTAMENTO ?? c.departamento})`;
+                    sel.appendChild(opt);
+                });
+            } catch {}
+        }
+
+        function activarTab(btn, tab) {
+            document.querySelectorAll('.rep-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            tabActual = tab;
+            document.getElementById('lblTituloReporte').textContent = config[tab].titulo;
+            document.getElementById('contenidoReporte').innerHTML = '<p class="text-muted">Presiona "Generar" para ver el reporte</p>';
+
+            const cfg = config[tab];
+            document.querySelectorAll('.filtro-fecha').forEach(el => el.style.display = cfg.fecha ? '' : 'none');
+            document.querySelector('.filtro-ciudad').style.display = cfg.ciudad ? '' : 'none';
+            document.querySelector('.filtro-cliente').style.display = cfg.cliente ? '' : 'none';
+        }
+
+        async function generarReporte() {
+            const fechaIni = document.getElementById('fFechaIni').value;
+            const fechaFin = document.getElementById('fFechaFin').value;
+            const idCiudad = parseInt(document.getElementById('fCiudad').value || '0');
+            const idCliente = parseInt(document.getElementById('fIdCliente').value || '0');
+
+            document.getElementById('contenidoReporte').innerHTML =
+                '<div class="py-4"><div class="spinner-border text-danger"></div><p class="mt-2">Consultando BD Réplica...</p></div>';
+
+            try {
+                let datos;
+                switch (tabActual) {
+                    case 'ventas':      datos = await reporteService.ventasDiarias(fechaIni, fechaFin, idCiudad); break;
+                    case 'top':        datos = await reporteService.productoTop(fechaIni, fechaFin, idCiudad); break;
+                    case 'historial':  datos = await reporteService.historialCliente(idCliente); break;
+                    case 'cajas':      datos = await reporteService.cierreCajas(fechaIni, fechaFin); break;
+                    case 'ltv':        datos = await reporteService.ltv(); break;
+                    case 'actividad':  datos = await reporteService.actividad(fechaIni, fechaFin); break;
+                    case 'retencion':  datos = await reporteService.retencion(); break;
+                    case 'cohorte':    datos = await reporteService.cohorte(); break;
+                    case 'remarketing':datos = await reporteService.remarketing(); break;
+                }
+                datosReporte = datos;
+                renderTabla(datos);
+            } catch (e) {
+                document.getElementById('contenidoReporte').innerHTML =
+                    `<div class="alert alert-danger">Error al generar reporte: ${e.message}</div>`;
+            }
+        }
+
+        function renderTabla(datos) {
+            if (!datos || !datos.length) {
+                document.getElementById('contenidoReporte').innerHTML =
+                    '<p class="text-muted py-4">Sin datos para el período seleccionado</p>';
+                return;
+            }
+            const keys = Object.keys(datos[0]);
+            let html = `<div class="table-responsive"><table class="table table-striped table-hover mb-0 small">
+                <thead class="table-secondary"><tr>${keys.map(k =>
+                    `<th>${k.replace(/_/g,' ')}</th>`).join('')}</tr></thead><tbody>`;
+            datos.forEach(row => {
+                html += '<tr>' + keys.map(k => {
+                    const v = row[k];
+                    if (v === null || v === undefined) return '<td class="text-muted">-</td>';
+                    const num = parseFloat(v);
+                    if (!isNaN(num) && k.includes('INGRESO') || k.includes('TOTAL') && !k.includes('COMPRAS') || k.includes('LTV') || k.includes('PROMEDIO') || k.includes('TICKET'))
+                        return `<td class="fw-bold text-success">Q ${num.toFixed(2)}</td>`;
+                    if (!isNaN(num) && (k.includes('PORCENTAJE')))
+                        return `<td>${num.toFixed(1)}%</td>`;
+                    return `<td>${v}</td>`;
+                }).join('') + '</tr>';
+            });
+            html += '</tbody></table></div>';
+            document.getElementById('contenidoReporte').innerHTML = html;
+        }
+
+        function exportarCSV() {
+            if (!datosReporte.length) { alert('Genera un reporte primero'); return; }
+            const keys = Object.keys(datosReporte[0]);
+            const rows = [keys.join(','), ...datosReporte.map(r => keys.map(k => `"${r[k] ?? ''}"`).join(','))];
+            const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `reporte_${tabActual}_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+        }
+
+        init();
+    </script>
+</body>
+</html>

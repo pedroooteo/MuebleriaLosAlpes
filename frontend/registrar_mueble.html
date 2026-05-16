@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Mueble - Los Alpes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container mt-5 mb-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between">
+                <h4 class="mb-0">Registrar Nuevo Mueble</h4>
+                <a href="dashboard.html" class="btn btn-sm btn-light">Volver al Catálogo</a>
+            </div>
+            <div class="card-body">
+                <div id="alertaMueble" class="alert d-none"></div>
+
+                <form id="formMueble">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label>Referencia (*)</label>
+                            <input type="text" id="ref" class="form-control" required>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label>Nombre (*)</label>
+                            <input type="text" id="nom" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Tipo (*)</label>
+                            <select id="tipo" class="form-control" required>
+                                <option value="INTERIOR">Interior</option>
+                                <option value="EXTERIOR">Exterior</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Material</label>
+                            <input type="text" id="mat" class="form-control">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3"><label>Alto (cm) (*)</label><input type="number" id="alto" class="form-control" required></div>
+                        <div class="col-md-4 mb-3"><label>Ancho (cm) (*)</label><input type="number" id="ancho" class="form-control" required></div>
+                        <div class="col-md-4 mb-3"><label>Profundidad (cm) (*)</label><input type="number" id="prof" class="form-control" required></div>
+                        
+                        <div class="col-md-6 mb-3"><label>Peso (gramos) (*)</label><input type="number" id="peso" class="form-control" required></div>
+                        <div class="col-md-6 mb-3"><label>Color</label><input type="text" id="color" class="form-control"></div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Precio de Venta (Q) (*)</label>
+                            <input type="number" step="0.01" min="0.01" id="precio" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Stock Inicial (*)</label>
+                            <input type="number" min="0" id="stock" class="form-control" required>
+                        </div>
+                        
+                        <div class="col-md-12 mb-3">
+                            <label>Descripción</label>
+                            <textarea id="desc" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('formMueble').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const alerta = document.getElementById('alertaMueble');
+            
+            // Recolectar datos incluyendo los nuevos campos
+            const mueble = {
+                Referencia: document.getElementById('ref').value,
+                Nombre: document.getElementById('nom').value,
+                Tipo: document.getElementById('tipo').value,
+                Material: document.getElementById('mat').value,
+                AltoCm: parseFloat(document.getElementById('alto').value),
+                AnchoCm: parseFloat(document.getElementById('ancho').value),
+                ProfundidadCm: parseFloat(document.getElementById('prof').value),
+                PesoGramos: parseFloat(document.getElementById('peso').value),
+                Color: document.getElementById('color').value,
+                Descripcion: document.getElementById('desc').value,
+                Precio: parseFloat(document.getElementById('precio').value),
+                Stock: parseInt(document.getElementById('stock').value)
+            };
+
+            try {
+                // ¡AQUÍ ESTÁ EL CAMBIO A 127.0.0.1!
+                const req = await fetch('http://localhost:8080/api/muebles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(mueble)
+                });
+                
+                const res = await req.json();
+                
+                alerta.classList.remove('d-none', 'alert-success', 'alert-danger');
+                if (res.exito) {
+                    alerta.classList.add('alert-success');
+                    alerta.textContent = res.mensaje;
+                    document.getElementById('formMueble').reset();
+                } else {
+                    alerta.classList.add('alert-danger');
+                    alerta.textContent = res.mensaje;
+                }
+            } catch (error) {
+                alerta.classList.remove('d-none', 'alert-success');
+                alerta.classList.add('alert-danger');
+                alerta.textContent = "Error conectando al servidor VB.NET. Asegúrate de que el backend esté corriendo en 127.0.0.1:5000";
+            }
+        });
+    </script>
+</body>
+</html>

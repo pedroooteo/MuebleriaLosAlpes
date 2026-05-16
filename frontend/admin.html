@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Muebles de los Alpes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #f4f6f9; }
+        .sidebar { width: 240px; min-height: 100vh; background: #1a1a2e; position: fixed; }
+        .sidebar .nav-link { color: #ccc; border-radius: 8px; margin: 2px 8px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #16213e; color: #fff; }
+        .sidebar .nav-link i { width: 20px; }
+        .main { margin-left: 240px; padding: 2rem; }
+        .stat-card { border: none; border-radius: 14px; }
+        .stat-icon { width: 56px; height: 56px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <nav class="sidebar d-flex flex-column py-3">
+        <div class="text-center mb-4 px-3">
+            <i class="fas fa-couch fa-2x text-warning"></i>
+            <div class="text-white fw-bold mt-1">Admin Panel</div>
+            <small class="text-secondary" id="lblAdminUser"></small>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link active" href="admin.html"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin_muebles.html"><i class="fas fa-couch me-2"></i>Muebles</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin_precios_stock.html"><i class="fas fa-tags me-2"></i>Precios & Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin_clientes.html"><i class="fas fa-users me-2"></i>Clientes</a></li>
+            <li class="nav-item"><a class="nav-link" href="admin_reportes.html"><i class="fas fa-chart-bar me-2"></i>Reportes</a></li>
+            <li class="nav-item mt-3"><hr class="border-secondary"></li>
+            <li class="nav-item"><a class="nav-link" href="catalogo.html"><i class="fas fa-store me-2"></i>Ver Tienda</a></li>
+            <li class="nav-item"><a class="nav-link text-danger" href="#" onclick="cerrarSesion()"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+        </ul>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+        <h3 class="fw-bold mb-4"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard</h3>
+
+        <div class="row g-3 mb-4" id="tarjetasStats"></div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white fw-bold">
+                        <i class="fas fa-shopping-bag me-2"></i>Acciones Rápidas
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="admin_muebles.html" class="btn btn-outline-dark text-start">
+                                <i class="fas fa-plus-circle me-2 text-success"></i>Registrar nuevo mueble
+                            </a>
+                            <a href="admin_muebles.html" class="btn btn-outline-dark text-start">
+                                <i class="fas fa-search me-2 text-primary"></i>Buscar / modificar mueble
+                            </a>
+                            <a href="admin_precios_stock.html" class="btn btn-outline-dark text-start">
+                                <i class="fas fa-tags me-2 text-warning"></i>Actualizar precios y stock
+                            </a>
+                            <a href="admin_clientes.html" class="btn btn-outline-dark text-start">
+                                <i class="fas fa-users me-2 text-info"></i>Gestionar clientes
+                            </a>
+                            <a href="admin_reportes.html" class="btn btn-outline-dark text-start">
+                                <i class="fas fa-chart-pie me-2 text-danger"></i>Ver reportes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white fw-bold">
+                        <i class="fas fa-info-circle me-2"></i>Información del Sistema
+                    </div>
+                    <div class="card-body small">
+                        <p><i class="fas fa-database me-2 text-success"></i><strong>BD Producción:</strong> Oracle XE localhost:1521/xe</p>
+                        <p><i class="fas fa-database me-2 text-warning"></i><strong>BD Réplica (Reportes):</strong> Oracle Standby (DataGuard)</p>
+                        <p><i class="fas fa-server me-2 text-info"></i><strong>API Backend:</strong> http://localhost:8080</p>
+                        <p><i class="fas fa-shield-alt me-2 text-danger"></i><strong>Seguridad:</strong> Roles Oracle (ROL_APP_ADMIN)</p>
+                        <p class="mb-0"><i class="fas fa-clock me-2 text-muted"></i><strong>Fecha:</strong> <span id="lblFecha"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="clases.js"></script>
+    <script>
+        if (!Sesion.requiereAdmin()) {}
+
+        document.getElementById('lblAdminUser').textContent = Sesion.usuario;
+        document.getElementById('lblFecha').textContent = new Date().toLocaleDateString('es-GT', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        async function cargarStats() {
+            const tarjetas = [
+                { label: 'Muebles',    icon: 'fa-couch',       color: 'bg-primary',   endpoint: '/api/admin/muebles' },
+                { label: 'Clientes',   icon: 'fa-users',       color: 'bg-success',   endpoint: '/api/admin/clientes' },
+                { label: 'Reportes',   icon: 'fa-chart-bar',   color: 'bg-warning',   endpoint: null },
+                { label: 'Categorías', icon: 'fa-list',        color: 'bg-info',      endpoint: '/api/admin/categorias' }
+            ];
+            const container = document.getElementById('tarjetasStats');
+
+            const counts = await Promise.allSettled([
+                muebleService.buscarAdmin('', ''),
+                clienteService.buscar(''),
+                Promise.resolve([]),
+                muebleService.categorias()
+            ]);
+
+            const labels = ['Muebles', 'Clientes', 'Reportes', 'Categorías'];
+            const icons  = ['fa-couch', 'fa-users', 'fa-chart-bar', 'fa-list'];
+            const colors = ['bg-primary', 'bg-success', 'bg-warning', 'bg-info'];
+            const valores = counts.map(r => r.status === 'fulfilled' ? (r.value?.length ?? '-') : '-');
+            valores[2] = '9'; // reportes fijos
+
+            labels.forEach((label, i) => {
+                const col = document.createElement('div');
+                col.className = 'col-sm-6 col-lg-3';
+                col.innerHTML = `
+                    <div class="card stat-card shadow-sm p-3 d-flex flex-row align-items-center gap-3">
+                        <div class="stat-icon ${colors[i]} text-white">
+                            <i class="fas ${icons[i]}"></i>
+                        </div>
+                        <div>
+                            <div class="fs-4 fw-bold">${valores[i]}</div>
+                            <div class="text-muted small">${label}</div>
+                        </div>
+                    </div>`;
+                container.appendChild(col);
+            });
+        }
+
+        function cerrarSesion() { Sesion.cerrar(); window.location.href = 'login.html'; }
+        cargarStats();
+    </script>
+</body>
+</html>
