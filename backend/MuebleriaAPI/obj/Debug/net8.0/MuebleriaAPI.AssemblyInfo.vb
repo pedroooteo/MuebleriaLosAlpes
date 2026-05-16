@@ -15,7 +15,7 @@ Imports System.Reflection
 <Assembly: System.Reflection.AssemblyCompanyAttribute("MuebleriaAPI"),  _
  Assembly: System.Reflection.AssemblyConfigurationAttribute("Debug"),  _
  Assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0"),  _
- Assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c2fabab979f50ba93991c578e87a964d84b84df6"),  _
+ Assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c3791ccba07e0ae7160da49f59b966e6a58c1ed"),  _
  Assembly: System.Reflection.AssemblyProductAttribute("MuebleriaAPI"),  _
  Assembly: System.Reflection.AssemblyTitleAttribute("MuebleriaAPI"),  _
  Assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")> 
