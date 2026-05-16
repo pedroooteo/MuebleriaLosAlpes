@@ -34,7 +34,7 @@ Module Program
 
             res.AddHeader("Access-Control-Allow-Origin", "*")
             res.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-            res.AddHeader("Access-Control-Allow-Headers", "Content-Type")
+            res.AddHeader("Access-Control-Allow-Headers", "Content-Type, ngrok-skip-browser-warning")
 
             If req.HttpMethod = "OPTIONS" Then
                 res.StatusCode = 204
