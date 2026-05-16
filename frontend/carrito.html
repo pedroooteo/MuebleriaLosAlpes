@@ -73,7 +73,7 @@
 
         async function cargarCarrito() {
             try {
-                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito?idCliente=${idCliente}`);
+                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito?idCliente=${idCliente}`, { headers: { 'ngrok-skip-browser-warning': '1' } });
                 const items = await res.json();
                 const container = document.getElementById('contenidoCarrito');
                 container.innerHTML = '';
@@ -134,7 +134,7 @@
             try {
                 const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito/eliminar', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
                     body: JSON.stringify({ idDetalle })
                 });
                 const data = await res.json();

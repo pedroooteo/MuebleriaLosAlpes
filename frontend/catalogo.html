@@ -139,7 +139,7 @@
         async function cargarCatalogo() {
             document.getElementById('cargando').style.display = 'block';
             try {
-                const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/muebles');
+                const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/muebles', { headers: { 'ngrok-skip-browser-warning': '1' } });
                 todosMuebles = await res.json();
                 renderMuebles(todosMuebles);
             } catch (e) {
@@ -218,7 +218,7 @@
 
         async function verDetalle(idMueble) {
             try {
-                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/muebles/detalle?id=${idMueble}`);
+                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/muebles/detalle?id=${idMueble}`, { headers: { 'ngrok-skip-browser-warning': '1' } });
                 const m = await res.json();
                 document.getElementById('modalNombre').textContent = m.Nombre;
                 document.getElementById('modalRef').textContent = m.Referencia;
@@ -257,7 +257,7 @@
             try {
                 const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito/agregar', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
                     body: JSON.stringify({ idCliente, idMueble, cantidad: 1 })
                 });
                 const data = await res.json();

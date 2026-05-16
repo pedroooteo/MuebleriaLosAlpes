@@ -104,7 +104,7 @@
 
         async function cargarPerfil() {
             try {
-                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/clientes/perfil?idCliente=${idCliente}`);
+                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/clientes/perfil?idCliente=${idCliente}`, { headers: { 'ngrok-skip-browser-warning': '1' } });
                 const p = await res.json();
                 document.getElementById('avatarLetra').textContent = p.nombre ? p.nombre[0].toUpperCase() : '?';
                 document.getElementById('perfilNombre').textContent = p.nombre;
@@ -122,7 +122,7 @@
 
         async function cargarHistorial() {
             try {
-                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/historial?idCliente=${idCliente}`);
+                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/historial?idCliente=${idCliente}`, { headers: { 'ngrok-skip-browser-warning': '1' } });
                 const lista = await res.json();
                 const contenedor = document.getElementById('listaHistorial');
                 document.getElementById('totalOrdenes').textContent = `${lista.length} órdenes`;

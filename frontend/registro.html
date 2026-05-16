@@ -117,7 +117,7 @@
     <script>
         async function cargarCiudades() {
             try {
-                const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/ciudades');
+                const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/ciudades', { headers: { 'ngrok-skip-browser-warning': '1' } });
                 const ciudades = await res.json();
                 const sel = document.getElementById('idCiudad');
                 sel.innerHTML = '<option value="">Seleccionar ciudad...</option>';
@@ -180,7 +180,7 @@
             try {
                 const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/registro', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
                     body: JSON.stringify(datos)
                 });
                 const data = await res.json();
