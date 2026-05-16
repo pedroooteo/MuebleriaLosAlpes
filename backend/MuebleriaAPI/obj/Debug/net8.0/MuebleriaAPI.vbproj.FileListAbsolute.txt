@@ -30,3 +30,4 @@ C:\Users\pedro\Desktop\DBFinalMuebleria\backend\MuebleriaAPI\obj\Debug\net8.0\re
 C:\Users\pedro\Desktop\DBFinalMuebleria\backend\MuebleriaAPI\obj\Debug\net8.0\MuebleriaAPI.pdb
 C:\Users\pedro\Desktop\DBFinalMuebleria\backend\MuebleriaAPI\obj\Debug\net8.0\MuebleriaAPI.genruntimeconfig.cache
 C:\Users\pedro\Desktop\DBFinalMuebleria\backend\MuebleriaAPI\obj\Debug\net8.0\ref\MuebleriaAPI.dll
+C:\Users\pedro\Desktop\DBFinalMuebleria\backend\MuebleriaAPI\obj\Debug\net8.0\MuebleriaAPI.sourcelink.json

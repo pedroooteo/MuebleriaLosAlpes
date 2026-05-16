@@ -95,6 +95,10 @@ Module Program
             ElseIf path = "/api/admin/clientes/eliminar" AndAlso req.HttpMethod = "POST" Then
                 ManejarEliminarCliente(req, res, clienteNegocio)
 
+            ' === REGISTRO ===
+            ElseIf path = "/api/registro" AndAlso req.HttpMethod = "POST" Then
+                ManejarRegistro(req, res, clienteNegocio)
+
             ' === CIUDADES ===
             ElseIf path = "/api/ciudades" AndAlso req.HttpMethod = "GET" Then
                 ManejarCiudades(req, res, carritoNegocio)
@@ -327,6 +331,33 @@ Module Program
             EscribirRespuesta(res, JsonSerializer.Serialize(carritoNeg.ObtenerCiudades()))
         Catch
             EscribirRespuesta(res, "[]")
+        End Try
+    End Sub
+
+    ' ==================== REGISTRO ====================
+    Private Sub ManejarRegistro(req As HttpListenerRequest, res As HttpListenerResponse, clienteNeg As ClienteNegocio)
+        Try
+            Dim body = LeerBody(req)
+            Dim d = JsonSerializer.Deserialize(Of Dictionary(Of String, JsonElement))(body)
+            clienteNeg.RegistrarCliente(
+                d("tipoDoc").GetString(),
+                d("numDoc").GetString(),
+                d("nombre").GetString(),
+                d("telResidencia").GetString(),
+                If(d.ContainsKey("telCelular"), d("telCelular").GetString(), ""),
+                d("direccion").GetString(),
+                d("idCiudad").GetInt32(),
+                d("email").GetString(),
+                If(d.ContainsKey("profesion"), d("profesion").GetString(), ""),
+                d("tipoPersona").GetString(),
+                If(d.ContainsKey("nit"), d("nit").GetString(), ""),
+                d("username").GetString(),
+                d("password").GetString()
+            )
+            EscribirRespuesta(res, "{ ""exito"": true, ""mensaje"": ""Cuenta creada exitosamente"" }")
+        Catch ex As Exception
+            res.StatusCode = 500
+            EscribirRespuesta(res, "{ ""exito"": false, ""mensaje"": """ & ex.Message.Replace("""", "'") & """ }")
         End Try
     End Sub
 
