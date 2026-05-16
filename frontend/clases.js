@@ -3,7 +3,7 @@
 // Muebles de los Alpes
 // =============================================
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = 'https://tinsmith-unlocked-squealing.ngrok-free.dev';
 
 // =============================================
 class ApiService {
@@ -13,14 +13,14 @@ class ApiService {
     async get(endpoint, params = {}) {
         const qs = new URLSearchParams(params).toString();
         const url = `${this.base}${endpoint}${qs ? '?' + qs : ''}`;
-        const res = await fetch(url);
+        const res = await fetch(url, { headers: { 'ngrok-skip-browser-warning': '1' } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
     }
     async post(endpoint, data) {
         const res = await fetch(`${this.base}${endpoint}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
             body: JSON.stringify(data)
         });
         return res.json();

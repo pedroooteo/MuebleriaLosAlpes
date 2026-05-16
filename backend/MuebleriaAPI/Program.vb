@@ -7,13 +7,19 @@ Imports MuebleriaAPI.Entidades
 
 Module Program
     Sub Main()
+        Dim puertoEnv = Environment.GetEnvironmentVariable("PORT")
+        Dim puerto = If(puertoEnv, "8080")
         Dim servidor As New HttpListener()
-        servidor.Prefixes.Add("http://localhost:8080/")
-        servidor.Prefixes.Add("http://127.0.0.1:8080/")
+        If puertoEnv IsNot Nothing Then
+            servidor.Prefixes.Add($"http://*:{puerto}/")
+        Else
+            servidor.Prefixes.Add($"http://localhost:{puerto}/")
+            servidor.Prefixes.Add($"http://127.0.0.1:{puerto}/")
+        End If
         servidor.Start()
 
         Console.WriteLine("=== SERVIDOR API MUEBLERÍA INICIADO ===")
-        Console.WriteLine("Escuchando en http://localhost:8080/")
+        Console.WriteLine($"Escuchando en http://localhost:{puerto}/")
 
         Dim authNegocio     As New SeguridadNegocio()
         Dim muebleNegocio   As New MuebleNegocio()
