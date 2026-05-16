@@ -12,7 +12,7 @@ document.getElementById('formLogin').addEventListener('submit', async function(e
     try {
         const respuesta = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
             body: JSON.stringify({ Username: username, Password: password })
         });
 
