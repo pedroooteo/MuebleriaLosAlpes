@@ -87,7 +87,7 @@
 
             try {
                 // ¡AQUÍ ESTÁ EL CAMBIO A 127.0.0.1!
-                const req = await fetch('http://localhost:8080/api/muebles', {
+                const req = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/muebles', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(mueble)

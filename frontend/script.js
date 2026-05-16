@@ -7,7 +7,7 @@ async function cargarMuebles() {
 
     console.log("🔄 Intentando cargar muebles...");
     try {
-        const res = await fetch('http://localhost:8080/api/muebles');
+        const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/muebles');
         console.log("📡 Status del servidor:", res.status);
         
         const muebles = await res.json();
@@ -45,7 +45,7 @@ async function agregarAlCarrito(idMueble) {
     console.log(`🛒 Intentando agregar mueble ID: ${idMueble}`);
 
     try {
-        const response = await fetch('http://localhost:8080/api/carrito/agregar', {
+        const response = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito/agregar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -77,7 +77,7 @@ async function cargarCarrito() {
     if (!container) return;
 
     try {
-        const res = await fetch(`http://localhost:8080/api/carrito?idCliente=${idClienteActual}`);
+        const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito?idCliente=${idClienteActual}`);
         const items = await res.json();
 
         let total = 0;
@@ -117,7 +117,7 @@ async function cargarCarrito() {
 async function efectuarCompra() {
     if (!confirm('¿Confirmar compra?')) return;
     try {
-        const res = await fetch('http://localhost:8080/api/compra', {
+        const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/compra', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idCliente: idClienteActual, formaPago: 'Tarjeta' })

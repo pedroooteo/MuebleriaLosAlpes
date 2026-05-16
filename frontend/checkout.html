@@ -116,7 +116,7 @@
 
         async function cargarResumen() {
             try {
-                const res = await fetch(`http://localhost:8080/api/carrito?idCliente=${idCliente}`);
+                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito?idCliente=${idCliente}`);
                 const items = await res.json();
                 const contenedor = document.getElementById('listaProductos');
 
@@ -165,7 +165,7 @@
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
 
             try {
-                const res = await fetch('http://localhost:8080/api/compra', {
+                const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/compra', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idCliente, formaPago: formaPagoSeleccionada })

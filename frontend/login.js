@@ -10,7 +10,7 @@ document.getElementById('formLogin').addEventListener('submit', async function(e
     btn.textContent = 'Verificando...';
 
     try {
-        const respuesta = await fetch('http://localhost:8080/api/login', {
+        const respuesta = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ Username: username, Password: password })

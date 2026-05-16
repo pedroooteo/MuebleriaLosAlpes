@@ -73,7 +73,7 @@
 
         async function cargarCarrito() {
             try {
-                const res = await fetch(`http://localhost:8080/api/carrito?idCliente=${idCliente}`);
+                const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito?idCliente=${idCliente}`);
                 const items = await res.json();
                 const container = document.getElementById('contenidoCarrito');
                 container.innerHTML = '';
@@ -132,7 +132,7 @@
         async function eliminarItem(idDetalle) {
             if (!confirm('¿Eliminar este producto del carrito?')) return;
             try {
-                const res = await fetch('http://localhost:8080/api/carrito/eliminar', {
+                const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito/eliminar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ idDetalle })

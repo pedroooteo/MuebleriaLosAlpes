@@ -5,7 +5,7 @@ async function cargarCarrito() {
     const totalEl = document.getElementById('totalCarrito');
 
     try {
-        const res = await fetch(`http://localhost:8080/api/carrito?idCliente=${idCliente}`);
+        const res = await fetch(`https://tinsmith-unlocked-squealing.ngrok-free.dev/api/carrito?idCliente=${idCliente}`);
         const items = await res.json();
 
         container.innerHTML = '';
@@ -46,7 +46,7 @@ async function efectuarCompra() {
     if (!confirm("¿Estás seguro de realizar la compra?")) return;
 
     try {
-        const res = await fetch('http://localhost:8080/api/compra', {
+        const res = await fetch('https://tinsmith-unlocked-squealing.ngrok-free.dev/api/compra', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
